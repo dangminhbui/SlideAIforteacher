@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Basic for Education - Nâng cao v3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        :root {
+            --primary-color: #0A2342;
+            --accent-color: #FBC02D;
+            --text-color: #333333;
+            --light-text-color: #FFFFFF;
+            --bg-color: #FFFFFF;
+            --light-bg-color: #f3f4f6;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --success-bg: #d4edda;
+            --danger-bg: #f8d7da;
+            --font-main: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            background-color: var(--light-bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            padding-top: 80px; /* Account for fixed header height + body padding */
+        }
+
+        #global-header {
+            width: 100%;
+            padding: 0 20px; 
+            background-color: var(--bg-color); /* Changed to light background */
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            box-sizing: border-box;
+            position: fixed; 
+            top: 0;
+            left: 0;
+            z-index: 2000; 
+            height: 60px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Lighter shadow for light header */
+        }
+
+        #global-logo {
+            height: 40px; 
+            width: auto;
+        }
+        
+        #print-pdf-button {
+            background-color: var(--primary-color); /* Primary color for button on light header */
+            color: var(--light-text-color); /* Light text for button */
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: background-color var(--transition-speed);
+        }
+        #print-pdf-button:hover {
+            background-color: #081f3a; /* Slightly darker primary */
+        }
+
+
+        .slideshow-container {
+            position: relative;
+            background-color: var(--bg-color); 
+            border-radius: 16px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0,0,0,0.05); 
+            overflow: hidden;
+            width: 100%;
+            max-width: 950px; 
+            aspect-ratio: 16/9; 
+            display: flex; 
+        }
+
+        .slide {
+            min-width: 100%; 
+            height: 100%;
+            padding: 30px 40px; 
+            text-align: left;
+            box-sizing: border-box;
+            overflow-y: auto; 
+            display: none; 
+            animation: fadeInAnimation 0.7s ease-out; 
+            background-color: var(--bg-color); 
+        }
+
+        @keyframes fadeInAnimation { 
+            from { opacity: 0.2; transform: scale(0.98) translateY(15px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .slide.active-slide { 
+            display: block;
+        }
+
+        .slide-header {
+            font-size: 2em; 
+            font-weight: 700;
+            color: var(--primary-color); 
+            margin-bottom: 20px; 
+            padding-bottom: 10px; 
+            border-bottom: 3px solid var(--accent-color); 
+        }
+        
+        .slide.title-slide .slide-header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%; 
+            text-align: center;
+        }
+         .slide.title-slide .main-title-h1 {
+            font-size: 2.8em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        .slide.title-slide .presenter-text {
+            font-size: 1.4em;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+
+        .slide-body {
+            font-size: 1.05em; 
+            line-height: 1.65; 
+            color: var(--text-color); 
+        }
+
+        .prev-nav, .next-nav {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px; 
+            margin-top: -25px;
+            color: var(--light-text-color);
+            font-weight: bold;
+            font-size: 20px;
+            transition: 0.5s ease;
+            border-radius: 50%;
+            user-select: none;
+            background-color: rgba(10, 35, 66, 0.7); 
+            z-index: 10;
+            width: 48px; 
+            height: 48px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .next-nav { right: 20px; }
+        .prev-nav { left: 20px; }
+
+        .prev-nav:hover, .next-nav:hover {
+            background-color: var(--accent-color); 
+            color: var(--primary-color); 
+            transform: scale(1.1);
+        }
+
+        .dots-navigation-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .dot-indicator {
+            cursor: pointer;
+            height: 14px;
+            width: 14px;
+            margin: 0 6px;
+            background-color: #cccccc; 
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.5s ease, transform 0.3s ease;
+        }
+        .dot-indicator.active-dot, .dot-indicator:hover {
+            background-color: var(--accent-color); 
+            transform: scale(1.2);
+        }
+
+        .quiz-question-container {
+            margin-bottom: 20px; 
+            padding: 15px; 
+            background-color: var(--light-bg-color); 
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+        .question-title {
+            font-size: 1.1em; 
+            font-weight: 600;
+            color: var(--primary-color); 
+            margin-bottom: 12px; 
+        }
+        .option-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); 
+            gap: 8px; 
+        }
+        .interactive-quiz-item { 
+            cursor: pointer;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color); 
+            padding: 10px 12px; 
+            margin: 4px 0; 
+            border-radius: var(--border-radius);
+            transition: background-color var(--transition-speed), transform 0.2s, box-shadow var(--transition-speed);
+            text-align: left;
+            font-size: 0.95em; 
+            color: var(--text-color);
+        }
+        .interactive-quiz-item:hover {
+            background-color: #e9ecef; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.07);
+        }
+        .interactive-quiz-item.selected {
+            background-color: var(--primary-color); 
+            color: var(--light-text-color);
+            font-weight: 500;
+            border-color: var(--primary-color);
+        }
+        .interactive-quiz-item.correct {
+            background-color: var(--success-bg); 
+            color: var(--success-color);
+            border-color: #c3e6cb;
+        }
+        .interactive-quiz-item.incorrect {
+            background-color: var(--danger-bg); 
+            color: var(--danger-color);
+            border-color: #f5c6cb;
+        }
+
+        .feedback { 
+            margin-top: 12px; 
+            padding: 10px 12px; 
+            border-radius: 6px;
+            font-size: 0.9em; 
+            border-left-width: 5px;
+            border-left-style: solid;
+        }
+        .feedback.correct {
+            background-color: #e6fff0;
+            border-left-color: var(--success-color); 
+            color: #1c7430;
+        }
+        .feedback.incorrect {
+            background-color: #fff0f1;
+            border-left-color: var(--danger-color); 
+            color: var(--danger-color);
+        }
+        .feedback:empty {
+            display: none;
+        }
+
+
+        hr.quiz-divider {
+            border: 0;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 20px 0; 
+        }
+
+        .checkbox-option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px; 
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px; 
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+        .checkbox-item:hover {
+            background-color: #e9ecef;
+        }
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: var(--primary-color); 
+            width: 16px; 
+            height: 16px; 
+        }
+        .checkbox-item span {
+            font-size: 0.95em; 
+        }
+        .checkbox-item.correct span {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        .checkbox-item.incorrect span {
+            text-decoration: line-through;
+        }
+
+
+        .check-answer-button {
+            background-color: var(--accent-color); 
+            color: var(--primary-color); 
+            padding: 10px 18px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), transform 0.2s;
+            display: inline-block;
+            margin-top: 12px; 
+            font-size: 1em;
+        }
+        .check-answer-button:hover {
+            background-color: #e0ac20; 
+            transform: translateY(-1px);
+        }
+        .check-answer-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .drag-drop-interaction-area {
+            display: flex;
+            flex-direction: column; 
+            gap: 15px; 
+            margin-top: 12px; 
+        }
+        #drag-source-q5 {
+            padding: 12px; 
+            background-color: #e9ecef; 
+            border-radius: var(--border-radius);
+            min-height: 80px; 
+            border: 1px dashed #adb5bd;
+        }
+        .drag-drop-instruction-text {
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 8px; 
+        }
+        .draggable-card-item {
+            background-color: var(--accent-color); 
+            color: var(--primary-color); 
+            padding: 8px 10px; 
+            margin: 6px 0; 
+            border-radius: 6px;
+            cursor: grab;
+            text-align: center;
+            border: 1px solid #e0ac20;
+            font-weight: 500;
+            transition: opacity 0.2s, box-shadow 0.2s;
+            font-size: 0.9em; 
+        }
+        .draggable-card-item:active {
+            cursor: grabbing;
+            opacity: 0.7;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .draggable-card-item.dragging-active { 
+            opacity: 0.5;
+        }
+
+        #drop-target-q5 {
+            display: flex;
+            flex-direction: column;
+            gap: 8px; 
+        }
+        .drop-zone-styled {
+            border: 2px dashed var(--primary-color); 
+            padding: 12px; 
+            min-height: 45px; 
+            border-radius: var(--border-radius);
+            background-color: var(--light-bg-color); 
+            display: flex;
+            align-items: center;
+            transition: background-color var(--transition-speed), border-style var(--transition-speed);
+            position: relative;
+        }
+        .drop-zone-number-indicator {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-right: 8px; 
+            font-size: 1em; 
+        }
+        .drop-zone-styled.drag-over-active { 
+            background-color: #e0e7ff; 
+            border-style: solid;
+        }
+        .drop-zone-styled .draggable-card-item { 
+            width: calc(100% - 25px); 
+            margin-left: auto; 
+        }
+        .drop-zone-styled.correct .draggable-card-item {
+            border: 2px solid var(--success-color);
+        }
+        .drop-zone-styled.incorrect .draggable-card-item {
+            border: 2px solid var(--danger-color);
+        }
+        
+        .quiz-score-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--primary-color); 
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--accent-color); 
+            display: none; 
+            border: 2px solid var(--accent-color);
+        }
+
+        .objective-cards {
+            list-style: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .objective-card {
+            background-color: var(--light-bg-color);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e0e7ff;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        .objective-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+        .objective-card .objective-icon {
+            font-size: 2.2em; 
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            background-color: var(--primary-color);
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .objective-card .objective-text {
+            font-size: 1em;
+            color: var(--primary-color);
+            line-height: 1.5;
+        }
+
+        .step-flow-container-custom {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 12px; 
+            margin-top: 15px;
+        }
+        .step-card-custom {
+            background-color: var(--primary-color); 
+            color: var(--light-text-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 15px; 
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed), color var(--transition-speed);
+            font-weight: 500;
+            font-size: 0.9em; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px; 
+        }
+         .step-card-custom .card-icon { 
+            font-size: 2em; 
+            margin-bottom: 10px; 
+            color: var(--accent-color); 
+        }
+        .step-card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(10, 35, 66, 0.2); 
+            background-color: var(--accent-color); 
+            color: var(--primary-color);
+        }
+         .step-card-custom:hover .card-icon {
+            color: var(--primary-color); 
+        }
+
+        /* Process Visualization for Slides 8, 9, 10 */
+        .process-flow-visualization {
+            display: flex;
+            flex-direction: column;
+            gap: 0; /* No gap, lines will connect */
+            position: relative;
+            margin-top: 20px;
+        }
+        .process-flow-step {
+            display: flex;
+            align-items: flex-start; /* Align icon/number with top of text */
+            position: relative;
+            padding: 15px 0; /* Vertical padding for step */
+            padding-left: 50px; /* Space for icon/number and line */
+        }
+        .process-flow-step:not(:last-child)::before { /* Vertical connector line */
+            content: '';
+            position: absolute;
+            left: 19px; /* Center of the number badge (approx) */
+            top: 45px;  /* Start below the number badge */
+            bottom: -15px; /* Extend to the padding of the next item, adjust if padding changes */
+            width: 2px;
+            background-color: var(--accent-color);
+            z-index: 1;
+        }
+
+        .process-step-indicator {
+            position: absolute;
+            left: 0;
+            top: 15px; /* Align with padding-top of step */
+            width: 40px; /* Diameter of circle */
+            height: 40px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            border: 2px solid var(--primary-color);
+            z-index: 2;
+        }
+        .process-step-content {
+            background-color: var(--light-bg-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .process-step-content h4 { /* Optional title within step */
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-size: 1.05em;
+        }
+        .process-step-content p {
+            margin: 0;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+
+        .slide-image-placeholder { 
+            width: 100%;
+            max-width: 350px; 
+            height: auto;
+            min-height: 150px; 
+            background-color: #e9ecef;
+            border: 2px dashed var(--accent-color); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color); 
+            font-size: 1em; 
+            font-weight: 500;
+            padding: 20px;
+            margin: 20px auto; 
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        /* Gemini API Integration Styles */
+        #gemini-interaction-area {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--light-bg-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+        #gemini-prompt-input {
+            width: calc(100% - 22px); 
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-main);
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        #gemini-submit-button {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+            font-size: 1em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #gemini-submit-button:hover {
+            background-color: #e0ac20;
+        }
+        #gemini-submit-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        #gemini-response-area {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            min-height: 50px;
+            line-height: 1.6;
+            white-space: pre-wrap; 
+        }
+        .loading-spinner {
+           border: 3px solid #f3f3f3;
+           border-top: 3px solid var(--primary-color);
+           border-radius: 50%;
+           width: 18px;
+           height: 18px;
+           animation: spin 1s linear infinite;
+           display: inline-block;
+        }
+       @keyframes spin {
+           0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+       }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body { padding-top: 70px; } 
+            .slideshow-container {
+                aspect-ratio: unset; 
+                min-height: calc(100vh - 90px); 
+                max-width: 100%;
+                margin-left: -20px; 
+                margin-right: -20px; 
+                width: calc(100% + 40px); 
+                border-radius: 0;
+            }
+            .slide {
+                padding: 20px 25px; 
+            }
+            .slide-header {
+                font-size: 1.7em; 
+            }
+             .slide.title-slide .main-title-h1 { font-size: 2.2em; }
+             .slide.title-slide .presenter-text { font-size: 1.2em; }
+
+            .slide-body {
+                font-size: 0.95em; 
+            }
+            .prev-nav, .next-nav {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+                padding: 8px;
+            }
+            .prev-nav { left: 10px; }
+            .next-nav { right: 10px; }
+            .dot-indicator {
+                height: 10px;
+                width: 10px;
+            }
+            .option-group {
+                grid-template-columns: 1fr; 
+            }
+            .step-flow-container-custom {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+            .objective-cards {
+                 grid-template-columns: 1fr;
+            }
+             .process-flow-step { padding-left: 45px; }
+             .process-step-indicator { width: 35px; height: 35px; font-size: 1em; }
+             .process-flow-step:not(:last-child)::before { left: 16px; top: 40px; }
+
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; padding-top: 70px; }
+            .slideshow-container { min-height: calc(100vh - 80px); margin-left: -10px; margin-right: -10px; width: calc(100% + 20px); }
+            .slide { padding: 15px; }
+            .slide-header { font-size: 1.5em; margin-bottom: 15px; }
+             .slide.title-slide .main-title-h1 { font-size: 1.8em !important; }
+             .slide.title-slide .presenter-text { font-size: 1.1em; }
+            .interactive-quiz-item, .check-answer-button { font-size: 0.85em; padding: 8px; }
+            .question-title { font-size: 1em; }
+            .feedback { font-size: 0.85em; }
+            .objective-card .objective-icon { width: 50px; height: 50px; font-size: 1.8em;}
+            .objective-card .objective-text { font-size: 0.9em;}
+            .step-card-custom { padding: 12px; font-size: 0.85em; min-height: 80px; }
+            .step-card-custom .card-icon { font-size: 1.5em; }
+            .process-flow-step { padding-left: 40px; padding-top: 10px; padding-bottom: 10px;}
+            .process-step-indicator { width: 30px; height: 30px; font-size: 0.9em; top:10px;}
+            .process-flow-step:not(:last-child)::before { left: 14px; top: 35px; bottom: -10px; }
+            .process-step-content { padding: 10px; }
+            .process-step-content p { font-size: 0.9em; }
+
+            #print-pdf-button { font-size: 0.8em; padding: 6px 10px;}
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                padding-top: 0;
+                background-color: var(--bg-color); 
+            }
+            #global-header, .prev-nav, .next-nav, .dots-navigation-container, #print-pdf-button {
+                display: none !important; 
+            }
+            .slideshow-container {
+                width: 100%;
+                max-width: 100%;
+                aspect-ratio: unset;
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                overflow: visible; 
+                display: block; 
+            }
+            .slide {
+                display: block !important; 
+                width: 100%;
+                height: auto !important; 
+                min-height: 0 !important;
+                padding: 20px; 
+                overflow-y: visible;
+                page-break-after: always; 
+                box-shadow: none;
+                border-bottom: 1px solid var(--border-color); 
+            }
+            .slide:last-child {
+                page-break-after: avoid;
+                border-bottom: none;
+            }
+            .slide-header {
+                font-size: 1.8em; 
+                border-bottom: 2px solid var(--accent-color);
+            }
+            .slide-body {
+                font-size: 1em; 
+            }
+            .quiz-question-container, .objective-card, .step-card-custom, .process-flow-step, #gemini-interaction-area {
+                background-color: var(--bg-color); 
+                border: 1px solid #ccc; 
+            }
+            .interactive-quiz-item.selected, .interactive-quiz-item.correct, .interactive-quiz-item.incorrect {
+                color: var(--text-color); 
+            }
+            .interactive-quiz-item.correct {
+                 border: 2px solid var(--success-color) !important;
+            }
+            .interactive-quiz-item.incorrect {
+                 border: 2px solid var(--danger-color) !important;
+            }
+             .feedback {
+                border-left-style: solid; 
+            }
+            .slide-image-placeholder {
+                border-style: solid; 
+            }
+            .process-flow-visualization { page-break-inside: avoid; }
+            .process-flow-step { page-break-inside: avoid; }
+        }
+
+    </style>
+</head>
+<body>
+    <header id="global-header">
+        <img src="https://i.postimg.cc/4d0PH133/LOGO-01.png" alt="Logo Công Ty" id="global-logo"
+             onerror="this.onerror=null; this.src='https://placehold.co/150x40/FFFFFF/0A2342?text=Logo&fontsize=14';">
+        <button id="print-pdf-button" title="In ra PDF"><i class="fas fa-print"></i> In PDF</button>
+    </header>
+
+    <div class="slideshow-container">
+        <div class="slide title-slide">
+            <div class="slide-header-content">
+                <h1 class="main-title-h1">AI BASIC FOR EDUCATION</h1>
+                <p class="presenter-text">PRESENTED BY BUI DANG MINH</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">BÀI KIỂM TRA NGẮN</div>
+            <div class="slide-body">
+                <div class="quiz-question-container" id="q1-container">
+                    <p class="question-title"><strong>Câu 1:</strong> AI chỉ hoạt động tốt khi điều kiện nào được đảm bảo?</p>
+                    <div class="option-group">
+                        <button class="interactive-quiz-item" data-question="q1" data-answer="A">A. Có tốc độ xử lý mạnh</button>
+                        <button class="interactive-quiz-item" data-question="q1" data-answer="B">B. Có kết nối internet ổn định</button>
+                        <button class="interactive-quiz-item" data-question="q1" data-answer="C">C. Dữ liệu đầu vào đủ lớn, chất lượng</button>
+                        <button class="interactive-quiz-item" data-question="q1" data-answer="D">D. Được cập nhật thường xuyên</button>
+                    </div>
+                    <div class="feedback" id="feedback-q1"></div>
+                </div>
+                <hr class="quiz-divider">
+                <div class="quiz-question-container" id="q2-container">
+                    <p class="question-title"><strong>Câu 2:</strong> Dạng dữ liệu nào sau đây KHÔNG phải là đầu vào phổ biến cho AI?</p>
+                    <div class="option-group">
+                        <button class="interactive-quiz-item" data-question="q2" data-answer="A">A. Văn bản</button>
+                        <button class="interactive-quiz-item" data-question="q2" data-answer="B">B. Hình ảnh</button>
+                        <button class="interactive-quiz-item" data-question="q2" data-answer="C">C. Âm thanh</button>
+                        <button class="interactive-quiz-item" data-question="q2" data-answer="D">D. Giấy viết tay</button>
+                    </div>
+                    <div class="feedback" id="feedback-q2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">BÀI KIỂM TRA NGẮN</div>
+            <div class="slide-body">
+                <div class="quiz-question-container" id="q3-container">
+                    <p class="question-title"><strong>Câu 3:</strong> Vai trò chính của dữ liệu trong quy trình vận hành AI là gì?</p>
+                    <div class="option-group">
+                        <button class="interactive-quiz-item" data-question="q3" data-answer="A">A. Giúp AI tạo video</button>
+                        <button class="interactive-quiz-item" data-question="q3" data-answer="B">B. Giúp AI sinh code</button>
+                        <button class="interactive-quiz-item" data-question="q3" data-answer="C">C. Huấn luyện và kiểm thử mô hình AI</button>
+                        <button class="interactive-quiz-item" data-question="q3" data-answer="D">D. Làm đẹp giao diện AI</button>
+                    </div>
+                    <div class="feedback" id="feedback-q3"></div>
+                </div>
+                <hr class="quiz-divider">
+                <div class="quiz-question-container" id="q4-container">
+                    <p class="question-title"><strong>Câu 4 (Chọn nhiều đáp án):</strong> Chọn các dạng dữ liệu đầu vào phù hợp với AI:</p>
+                    <div class="checkbox-option-group">
+                        <label class="checkbox-item"><input type="checkbox" name="q4" value="VB"><span>Văn bản</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="q4" value="HA"><span>Hình ảnh</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="q4" value="NBT"><span>Nét bút tay chưa số hóa</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="q4" value="AT"><span>Âm thanh</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="q4" value="DLB"><span>Dữ liệu dạng bảng (Excel, CSV)</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="q4" value="CX"><span>Cảm xúc con người</span></label>
+                    </div>
+                    <button id="check-q4" class="check-answer-button">Kiểm tra Câu 4</button>
+                    <div class="feedback" id="feedback-q4"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">BÀI KIỂM TRA NGẮN</div>
+            <div class="slide-body">
+                <p class="question-title"><strong>Câu 5:</strong> Quy trình vận hành cơ bản của AI gồm các bước nào sau đây? (Sắp xếp đúng thứ tự)</p>
+                <div class="drag-drop-interaction-area">
+                    <div id="drag-source-q5">
+                        <p class="drag-drop-instruction-text"><strong>Kéo các bước từ đây:</strong></p>
+                        </div>
+                    <div id="drop-target-q5">
+                        <p class="drag-drop-instruction-text"><strong>Thả vào các ô theo đúng thứ tự:</strong></p>
+                        <div class="drop-zone-styled" data-order="1"><span class="drop-zone-number-indicator">1</span></div>
+                        <div class="drop-zone-styled" data-order="2"><span class="drop-zone-number-indicator">2</span></div>
+                        <div class="drop-zone-styled" data-order="3"><span class="drop-zone-number-indicator">3</span></div>
+                        <div class="drop-zone-styled" data-order="4"><span class="drop-zone-number-indicator">4</span></div>
+                    </div>
+                </div>
+                <button id="check-q5" class="check-answer-button">Kiểm tra thứ tự</button>
+                <div class="feedback" id="feedback-q5"></div>
+                <div id="quiz-score-display" class="quiz-score-container"></div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">Mục tiêu</div>
+            <div class="slide-body">
+                <ul class="objective-cards">
+                    <li class="objective-card">
+                        <div class="objective-icon"><i class="fas fa-rocket"></i></div>
+                        <div class="objective-text">Thầy cô cập nhật công cụ AI tân tiến nhất để không bị tụt hậu.</div>
+                    </li>
+                    <li class="objective-card">
+                        <div class="objective-icon"><i class="fas fa-cogs"></i></div>
+                        <div class="objective-text">Ứng dụng AI vào các nhiệm vụ một cách toàn diện để tiết kiệm thời gian.</div>
+                    </li>
+                    <li class="objective-card">
+                        <div class="objective-icon"><i class="fas fa-users"></i></div>
+                        <div class="objective-text">Kết nối với học sinh, sinh viên nhằm thúc đẩy tinh thần học tập chủ động.</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">BUỔI 1 - TỔNG QUAN ỨNG DỤNG</div>
+            <div class="slide-body">
+                <div class="step-flow-container-custom">
+                    <div class="step-card-custom"><i class="fas fa-calendar-alt card-icon"></i>LẬP KẾ HOẠCH GIẢNG DẠY</div>
+                    <div class="step-card-custom"><i class="fas fa-book-open card-icon"></i>GIÁO ÁN TỪNG KỲ, TỪNG TIẾT</div>
+                    <div class="step-card-custom"><i class="fas fa-desktop card-icon"></i>LÀM SLIDE</div>
+                    <div class="step-card-custom"><i class="fas fa-lightbulb card-icon"></i>VÍ DỤ MINH HOẠ</div>
+                    <div class="step-card-custom"><i class="fas fa-users-cog card-icon"></i>HOẠT ĐỘNG LỚP HỌC</div>
+                    <div class="step-card-custom"><i class="fas fa-theater-masks card-icon"></i>KỊCH BẢN GIẢNG</div>
+                    <div class="step-card-custom"><i class="fas fa-pencil-ruler card-icon"></i>BÀI TẬP VỀ NHÀ</div>
+                    <div class="step-card-custom"><i class="fas fa-file-alt card-icon"></i>TẠO ĐỀ CƯƠNG ÔN TẬP</div>
+                    <div class="step-card-custom"><i class="fas fa-graduation-cap card-icon"></i>TẠO NGÂN HÀNG ĐỀ THI THEO CÁC CẤP ĐỘ</div>
+                    <div class="step-card-custom"><i class="fas fa-robot card-icon"></i>CHẤM BÀI TỰ ĐỘNG</div>
+                    <div class="step-card-custom"><i class="fas fa-balance-scale card-icon"></i>TÓM TẮT VĂN BẢN, SO SÁNH LUẬT</div>
+                    <div class="step-card-custom"><i class="fas fa-project-diagram card-icon"></i>SƠ ĐỒ TƯ DUY, QUY TRÌNH LÀM VIỆC</div>
+                    <div class="step-card-custom"><i class="fas fa-font card-icon"></i>SỬA FONT CHỮ VỚI MÔN HỌC CÓ KÝ TỰ ĐẶC BIỆT</div>
+                    <div class="step-card-custom"><i class="fas fa-file-excel card-icon"></i>CHUYỂN ẢNH SANG EXCEL, DOCX</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">Công thức PROMPT</div>
+            <div class="slide-body">
+                <div class="process-flow-visualization">
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">1</div>
+                        <div class="process-step-content">
+                            <h4>Mô tả thông tin về bản thân</h4>
+                            <p>Mình là ai? Mình đang làm nghề gì? với bao nhiêu năm kinh nghiệm? Mục tiêu mình cần ChatGPT lúc này là gì? (kết quả đầu ra mong muốn)</p>
+                        </div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">2</div>
+                        <div class="process-step-content">
+                            <h4>Yêu cầu ChatGPT</h4>
+                            <p>Luôn viết trong cuộc hội thoại đầu tiên: “ChatGPT viết prompt giúp mình giải quyết nhu cầu ở mục 1. ChatGPT hãy nêu rõ vai trò của ChatGPT là gì trong nhiệm vụ này. Hãy hỏi lại tôi các thông tin cần thiết nếu chưa hiểu nhu cầu"</p>
+                        </div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">3</div>
+                        <div class="process-step-content">
+                            <h4>Phản biện</h4>
+                            <p>Phản biện lại kết quả nếu hài lòng kết quả ChatGPT trả lời sau câu prompt đầu tiên. Tạo thành chuỗi hỏi đáp như bình thường cho đến khi hài lòng.</p>
+                        </div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">4</div>
+                        <div class="process-step-content">
+                            <h4>Yêu cầu về độ tin cậy</h4>
+                            <p>Luôn yêu cầu ChatGPT như sau trong mọi câu lệnh: “Đảm bảo câu trả lời có nguồn đáng tin cậy, uy tín, logic. Câu trả lời không được thiên vị, thiên kiến chủ quan, đảm bảo công bằng, minh bạch.”</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">Quy trình soạn giáo án slide</div>
+            <div class="slide-body">
+                <div class="process-flow-visualization">
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">1</div>
+                        <div class="process-step-content"><p>Vào Notebook LM tạo không gian làm việc, đặt tên theo môn học và lớp mình giảng dạy.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">2</div>
+                        <div class="process-step-content"><p>Tải sách giáo khoa và kế hoạch giảng dạy được phân công, công văn tiêu chuẩn đầu ra của cấp dạy vào notebook LM.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">3</div>
+                        <div class="process-step-content"><p>Đặt câu lệnh với chatbot: soạn giáo tiết nào, bài nào, chương nào từ nội dung SGK.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">4</div>
+                        <div class="process-step-content"><p>Copy nội dung đó sang trợ lý AI ChatGPT và đặt câu lệnh yêu cầu soạn lại giáo án cho mượt mà câu chữ hơn.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">5</div>
+                        <div class="process-step-content"><p>Chuyển giáo án bản word thành cấu trúc thẻ slide bằng cách đặt câu lệnh ChatGPT.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">6</div>
+                        <div class="process-step-content"><p>Copy văn bản cấu trúc thẻ ở bước 2 vào https://www.bibcit.com/en/massivemark nếu có ký tự đặc biệt như môn toán, lý, hoá (nếu ko có bỏ qua bước này).</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">7</div>
+                        <div class="process-step-content"><p>Vào Gamma AI hoặc Kimi AI tạo slide tự động.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">8</div>
+                        <div class="process-step-content"><p>Chỉnh sửa chi tiết: tải từ Gamma hoặc Kimi về đưa lên Canva.</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">Buổi 2 - Quy trình video từ ảnh</div>
+            <div class="slide-body">
+                 <div class="process-flow-visualization">
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">1</div>
+                        <div class="process-step-content"><p>Chụp ảnh SGK cần làm video, hoặc lựa chọn tình huống để làm video.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">2</div>
+                        <div class="process-step-content"><p>Làm nét lại ảnh SGK nếu bị vỡ hình trên canva và tải ảnh về.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">3</div>
+                        <div class="process-step-content"><p>Chọn công cụ AI chuyển từ ảnh sang video: Kling AI, Vidu AI, Dreamina AI.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">4</div>
+                        <div class="process-step-content"><p>Vào chatgpt, tải ảnh dùng làm video và yêu cầu ChatGPT viết prompt bằng tiếng anh để chuyển đổi theo kịch bản tình huống thầy cô lựa chọn.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">5</div>
+                        <div class="process-step-content"><p>Copy Prompt Chatgpt vừa gửi, tải ảnh SGK lên AI chuyển ảnh sang video để thực hiện Gen Ảnh => video.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">6</div>
+                        <div class="process-step-content"><p>Thực hiện lồng tiếng bằng AI theo kịch bản đã có theo SGK, nếu chưa có yêu cầu ChatGPT viết kịch bản.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">7</div>
+                        <div class="process-step-content"><p>Tải file lồng tiếng và video đã được chuyển từ ảnh về 1 file dễ tìm kiếm trong máy.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">8</div>
+                        <div class="process-step-content"><p>Vào canva pro hoặc capcut để ghép video, âm thanh lồng tiếng, tạo phụ đề tự động.</p></div>
+                    </div>
+                     <div class="process-flow-step">
+                        <div class="process-step-indicator">9</div>
+                        <div class="process-step-content"><p>Xuất file video và đưa vào slide bài giảng.</p></div>
+                    </div>
+                </div>
+                 <div class="slide-image-placeholder">Minh họa: Ảnh SGK -> Video AI</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">Buổi 2 - Quy trình tạo trò chơi tương tác</div>
+            <div class="slide-body">
+                <div class="process-flow-visualization">
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">1</div>
+                        <div class="process-step-content"><p>Đặt câu lệnh cho chatgpt gợi ý ý tưởng trò chơi tương tác... + nêu rõ dùng canva AI để tạo trò chơi trong câu lệnh.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">2</div>
+                        <div class="process-step-content"><p>Ưng ý với trò chơi, đặt câu lệnh cho ChatGPT viết prompt tạo trò chơi này trong canva AI để thuận tiện copy và dán.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">3</div>
+                        <div class="process-step-content"><p>Copy prompt vừa xong sang Canva và dán vào ô chat, đồng thời tích vào ô “viết code cho tôi".</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">4</div>
+                        <div class="process-step-content"><p>Chờ một lát có bản xem trước và chơi thử. nếu cần điều chỉnh hãy đắt tiếp câu lệnh cho canva ngay tại đó.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">5</div>
+                        <div class="process-step-content"><p>Ưng ý bản game rồi click vào “Dùng trong thiết kế" và chọn “Trang web".</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">6</div>
+                        <div class="process-step-content"><p>Canva chuyển sang trang mới. Click tiếp vào ô đăng trang web.</p></div>
+                    </div>
+                    <div class="process-flow-step">
+                        <div class="process-step-indicator">7</div>
+                        <div class="process-step-content"><p>Canva trả về link trang website công khai để vào chơi trò chơi.</p></div>
+                    </div>
+                </div>
+                 <div class="slide-image-placeholder">Minh họa: Ý tưởng -> Game tương tác</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="slide-header">Hỏi AI về Giáo dục</div>
+            <div class="slide-body">
+                <p>Bạn có câu hỏi nào về việc ứng dụng AI trong giáo dục không? Hãy hỏi Gemini!</p>
+                <div id="gemini-interaction-area">
+                    <textarea id="gemini-prompt-input" rows="4" placeholder="Nhập câu hỏi của bạn ở đây..."></textarea>
+                    <button id="gemini-submit-button">
+                        <i class="fas fa-paper-plane"></i> Gửi câu hỏi
+                        <div class="loading-spinner" style="display: none;"></div>
+                    </button>
+                    <div id="gemini-response-area">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide title-slide">
+             <div class="slide-header-content">
+                <h2 class="main-title-h1" style="font-size: 3em; color: #0A2342;">Thank you</h2>
+                <p class="presenter-text" style="font-size: 1.2em; color: #333333;">Cảm ơn bạn đã theo dõi!</p>
+            </div>
+        </div>
+
+        <a class="prev-nav" onclick="plusSlides(-1)">&#10094;</a>
+        <a class="next-nav" onclick="plusSlides(1)">&#10095;</a>
+    </div>
+
+    <div class="dots-navigation-container">
+        </div>
+
+    <script>
+        let currentSlideIndex = 0; 
+        let slides = [];
+        let dots = [];
+        let userCorrectAnswers = 0;
+        const totalQuizQuestions = 5; // Q1, Q2, Q3, Q4, Q5
+
+        document.addEventListener('DOMContentLoaded', () => {
+            slides = document.querySelectorAll(".slideshow-container .slide");
+            const dotsContainer = document.querySelector(".dots-navigation-container");
+
+            if (slides.length > 0) {
+                for (let i = 0; i < slides.length; i++) {
+                    let dot = document.createElement("span");
+                    dot.classList.add("dot-indicator");
+                    dot.setAttribute("onclick", "navigateToSlide(" + i + ")");
+                    dotsContainer.appendChild(dot);
+                    dots.push(dot);
+                }
+                showSlides(currentSlideIndex); 
+            }
+
+            initializeQuizOptions();
+            initializeCheckboxQuiz();
+            initializeDragAndDropQuiz();
+            initializeGeminiInteraction(); 
+
+            const printButton = document.getElementById('print-pdf-button');
+            if(printButton) {
+                printButton.addEventListener('click', () => {
+                    window.print();
+                });
+            }
+
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+                    plusSlides(-1);
+                } else if (event.key === 'ArrowRight' || event.key === 'PageDown') {
+                    plusSlides(1);
+                }
+            });
+        });
+
+        function plusSlides(n) {
+            showSlides(currentSlideIndex + n);
+        }
+
+        function navigateToSlide(n) {
+            showSlides(n);
+        }
+
+        function showSlides(n) {
+            if (n >= slides.length) {
+                currentSlideIndex = slides.length - 1;
+            } else if (n < 0) {
+                currentSlideIndex = 0;
+            } else {
+                currentSlideIndex = n;
+            }
+
+            slides.forEach(slide => slide.classList.remove('active-slide'));
+            dots.forEach(dot => dot.classList.remove('active-dot'));
+
+            if (slides[currentSlideIndex]) {
+                slides[currentSlideIndex].classList.add('active-slide');
+                if (slides[currentSlideIndex].scrollTop > 0) {
+                    slides[currentSlideIndex].scrollTop = 0;
+                }
+            }
+            if (dots[currentSlideIndex]) {
+                dots[currentSlideIndex].classList.add('active-dot');
+            }
+
+            const prevButton = document.querySelector('.prev-nav');
+            const nextButton = document.querySelector('.next-nav');
+            if (prevButton && nextButton) {
+                prevButton.style.display = currentSlideIndex === 0 ? 'none' : 'flex';
+                nextButton.style.display = currentSlideIndex === slides.length - 1 ? 'none' : 'flex';
+            }
+        }
+        
+        function displayQuizScore() {
+            const scoreDisplay = document.getElementById('quiz-score-display');
+            if (scoreDisplay) {
+                scoreDisplay.innerHTML = `Điểm của bạn: ${userCorrectAnswers} / ${totalQuizQuestions}`;
+                scoreDisplay.style.display = 'block';
+            }
+        }
+
+        function initializeQuizOptions() {
+            const quizOptions = document.querySelectorAll('.interactive-quiz-item');
+            const correctAnswers = {
+                q1: { correct: 'C', feedback: 'Dữ liệu là “nhiên liệu” của AI. Nếu không có dữ liệu chất lượng, AI sẽ cho ra kết quả kém – đây gọi là nguyên lý GIGO (Garbage In – Garbage Out).' },
+                q2: { correct: 'D', feedback: 'AI thường tiếp nhận dữ liệu số hóa. Giấy viết tay nếu chưa được số hóa (scan, OCR) thì AI không thể xử lý.' },
+                q3: { correct: 'C', feedback: 'Dữ liệu giúp AI “học” qua huấn luyện, và được dùng để kiểm tra độ chính xác (testing) của mô hình.' }
+            };
+
+            quizOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const questionId = option.dataset.question;
+                    const selectedAnswer = option.dataset.answer;
+                    const feedbackEl = document.getElementById(`feedback-${questionId}`);
+                    const questionContainer = option.closest('.quiz-question-container');
+                    const allOptionsForThisQuestion = questionContainer.querySelectorAll(`.interactive-quiz-item[data-question="${questionId}"]`);
+
+                    if (questionContainer.classList.contains('answered')) return; 
+
+                    questionContainer.classList.add('answered');
+                    allOptionsForThisQuestion.forEach(opt => {
+                        opt.disabled = true; 
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+
+                    if (correctAnswers[questionId].correct === selectedAnswer) {
+                        option.classList.add('correct');
+                        feedbackEl.innerHTML = `<i class="fas fa-check-circle"></i> Đúng! ${correctAnswers[questionId].feedback}`;
+                        feedbackEl.className = 'feedback correct';
+                        if(questionId === 'q1' || questionId === 'q2' || questionId === 'q3') {
+                            userCorrectAnswers++;
+                        }
+                    } else {
+                        option.classList.add('incorrect');
+                        feedbackEl.innerHTML = `<i class="fas fa-times-circle"></i> Sai. ${correctAnswers[questionId].feedback}`;
+                        feedbackEl.className = 'feedback incorrect';
+                        allOptionsForThisQuestion.forEach(opt => {
+                            if (opt.dataset.answer === correctAnswers[questionId].correct) {
+                                opt.classList.add('correct'); 
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function initializeCheckboxQuiz() {
+            const checkQ4Button = document.getElementById('check-q4');
+            if (!checkQ4Button) return;
+
+            const q4Checkboxes = document.querySelectorAll('input[name="q4"]');
+            const feedbackQ4 = document.getElementById('feedback-q4');
+            const correctAnswersQ4 = ['VB', 'HA', 'AT', 'DLB']; 
+
+            checkQ4Button.addEventListener('click', () => {
+                if (checkQ4Button.disabled) return;
+
+                const selectedAnswersQ4 = [];
+                q4Checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedAnswersQ4.push(checkbox.value);
+                    }
+                    checkbox.parentElement.classList.remove('correct', 'incorrect');
+                    checkbox.disabled = true;
+                });
+
+                let isPerfect = true;
+                let correctSelectionsCount = 0;
+
+                q4Checkboxes.forEach(checkbox => {
+                    const isCorrectOption = correctAnswersQ4.includes(checkbox.value);
+                    if (checkbox.checked) {
+                        if (isCorrectOption) {
+                            checkbox.parentElement.classList.add('correct');
+                            correctSelectionsCount++;
+                        } else {
+                            checkbox.parentElement.classList.add('incorrect');
+                            isPerfect = false;
+                        }
+                    } else { 
+                        if (isCorrectOption) { 
+                            isPerfect = false;
+                        }
+                    }
+                });
+                
+                if (correctSelectionsCount !== correctAnswersQ4.length || selectedAnswersQ4.length !== correctSelectionsCount) {
+                     isPerfect = false;
+                }
+                
+                if (isPerfect) {
+                    userCorrectAnswers++;
+                    feedbackQ4.innerHTML = `<i class="fas fa-check-circle"></i> Chính xác! Các đáp án đúng là: Văn bản, Hình ảnh, Âm thanh, Dữ liệu dạng bảng.`;
+                    feedbackQ4.className = 'feedback correct';
+                } else {
+                    let incorrectFeedback = 'Chưa hoàn toàn đúng. ';
+                    if (correctSelectionsCount > 0) {
+                        incorrectFeedback += `Bạn đã chọn đúng ${correctSelectionsCount} đáp án. `;
+                    }
+                    incorrectFeedback += 'Các dạng dữ liệu đầu vào phù hợp là: Văn bản, Hình ảnh, Âm thanh, và Dữ liệu dạng bảng (Excel, CSV).';
+                    feedbackQ4.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${incorrectFeedback}`;
+                    feedbackQ4.className = 'feedback incorrect';
+                    q4Checkboxes.forEach(checkbox => {
+                        if (correctAnswersQ4.includes(checkbox.value)) {
+                             checkbox.parentElement.classList.add('correct');
+                        }
+                    });
+                }
+                checkQ4Button.disabled = true;
+            });
+        }
+
+        function initializeDragAndDropQuiz() {
+            const dragSourceContainer = document.getElementById('drag-source-q5');
+            const dropZones = document.querySelectorAll('.drop-zone-styled');
+            const checkQ5Button = document.getElementById('check-q5');
+            const feedbackQ5 = document.getElementById('feedback-q5');
+
+            if (!dragSourceContainer || dropZones.length === 0 || !checkQ5Button) return;
+
+            const q5Steps = [
+                { id: 'step1-q5', text: 'Thu thập và chuẩn hóa dữ liệu', order: 1 },
+                { id: 'step2-q5', text: 'Huấn luyện mô hình', order: 2 },
+                { id: 'step3-q5', text: 'Dự đoán/kết quả', order: 3 },
+                { id: 'step4-q5', text: 'Đánh giá và cải tiến mô hình', order: 4 }
+            ];
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            let shuffledSteps = [...q5Steps];
+            shuffleArray(shuffledSteps);
+            dragSourceContainer.innerHTML = '<p class="drag-drop-instruction-text"><strong>Kéo các bước từ đây:</strong></p>'; 
+
+            shuffledSteps.forEach(step => {
+                const card = document.createElement('div');
+                card.classList.add('draggable-card-item');
+                card.setAttribute('draggable', true);
+                card.id = step.id;
+                card.dataset.order = step.order;
+                card.textContent = step.text;
+                dragSourceContainer.appendChild(card);
+
+                card.addEventListener('dragstart', (event) => {
+                    event.dataTransfer.setData('text/plain', event.target.id);
+                    event.target.classList.add('dragging-active');
+                });
+
+                card.addEventListener('dragend', (event) => {
+                    event.target.classList.remove('dragging-active');
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (event) => {
+                    event.preventDefault();
+                    let hasDraggable = false;
+                    for(let child of zone.children) {
+                        if (child.classList.contains('draggable-card-item')) {
+                            hasDraggable = true;
+                            break;
+                        }
+                    }
+                    if (!hasDraggable) { 
+                         zone.classList.add('drag-over-active');
+                    }
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over-active');
+                });
+                zone.addEventListener('drop', (event) => {
+                    event.preventDefault();
+                    zone.classList.remove('drag-over-active');
+                    const draggedCardId = event.dataTransfer.getData('text/plain');
+                    const draggedCard = document.getElementById(draggedCardId);
+
+                    let hasDraggable = false;
+                    for(let child of zone.children) {
+                        if (child.classList.contains('draggable-card-item')) {
+                            hasDraggable = true;
+                            break;
+                        }
+                    }
+
+                    if (draggedCard && !hasDraggable) {
+                        if (draggedCard.parentElement.classList.contains('drop-zone-styled')) {
+                            draggedCard.parentElement.removeChild(draggedCard);
+                        }
+                        zone.appendChild(draggedCard);
+                    }
+                });
+            });
+
+            checkQ5Button.addEventListener('click', () => {
+                if (checkQ5Button.disabled) return;
+                let isCorrectOrder = true;
+                let placedCount = 0;
+
+                dropZones.forEach(zone => {
+                    const card = zone.querySelector('.draggable-card-item');
+                    zone.classList.remove('correct', 'incorrect');
+                    if (card) {
+                        card.classList.remove('correct', 'incorrect');
+                        placedCount++;
+                        const cardCorrectOrder = parseInt(card.dataset.order);
+                        const zoneTargetOrder = parseInt(zone.dataset.order);
+                        if (cardCorrectOrder !== zoneTargetOrder) {
+                            isCorrectOrder = false;
+                            zone.classList.add('incorrect'); 
+                        } else {
+                            zone.classList.add('correct'); 
+                        }
+                        card.setAttribute('draggable', false);
+                    } else {
+                        isCorrectOrder = false; 
+                        zone.classList.add('incorrect');
+                    }
+                });
+                
+                if (placedCount < q5Steps.length) isCorrectOrder = false;
+
+                if (isCorrectOrder) {
+                    userCorrectAnswers++;
+                    feedbackQ5.innerHTML = `<i class="fas fa-check-circle"></i> Chính xác! Thứ tự các bước đã đúng.`;
+                    feedbackQ5.className = 'feedback correct';
+                } else {
+                    feedbackQ5.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Chưa đúng. Vui lòng kiểm tra lại. Thứ tự đúng là: 1. Thu thập và chuẩn hóa dữ liệu, 2. Huấn luyện mô hình, 3. Dự đoán/kết quả, 4. Đánh giá và cải tiến mô hình.`;
+                    feedbackQ5.className = 'feedback incorrect';
+                }
+                checkQ5Button.disabled = true;
+                dragSourceContainer.querySelectorAll('.draggable-card-item').forEach(card => {
+                    card.setAttribute('draggable', false);
+                    card.style.opacity = '0.6';
+                });
+                displayQuizScore(); 
+            });
+        }
+
+        // --- Gemini API Integration ---
+        function initializeGeminiInteraction() {
+            const submitButton = document.getElementById('gemini-submit-button');
+            const promptInput = document.getElementById('gemini-prompt-input');
+            const responseArea = document.getElementById('gemini-response-area');
+            const loadingSpinner = submitButton ? submitButton.querySelector('.loading-spinner') : null;
+
+            if (!submitButton || !promptInput || !responseArea) {
+                console.log("Gemini UI elements not found. Skipping initialization.");
+                return;
+            }
+
+            submitButton.addEventListener('click', async () => {
+                const promptText = promptInput.value.trim();
+                if (!promptText) {
+                    responseArea.textContent = "Vui lòng nhập câu hỏi của bạn.";
+                    return;
+                }
+
+                if (submitButton) submitButton.disabled = true;
+                if (loadingSpinner) loadingSpinner.style.display = 'inline-block';
+                responseArea.textContent = "Đang xử lý yêu cầu, vui lòng đợi...";
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: "Bối cảnh: AI trong giáo dục. Câu hỏi: " + promptText }] });
+                const payload = { contents: chatHistory };
+                const apiKey = "AIzaSyDq9YTwEXlta0-diaqVfkHgSuT6maAVDoo"; // API Key will be provided by Canvas environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("API Error Data:", errorData);
+                        throw new Error(`Yêu cầu API thất bại với trạng thái ${response.status}: ${errorData.error?.message || 'Lỗi không xác định từ API'}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        responseArea.textContent = text;
+                    } else {
+                        console.error("Cấu trúc phản hồi API không mong muốn:", result);
+                        responseArea.textContent = "Không nhận được phản hồi hợp lệ từ AI. Vui lòng kiểm tra console để biết chi tiết.";
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi gọi Gemini API:", error);
+                    responseArea.textContent = `Đã xảy ra lỗi: ${error.message}. Vui lòng thử lại sau.`;
+                } finally {
+                    if (submitButton) submitButton.disabled = false;
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
